@@ -1,5 +1,6 @@
 package com.example.to_do.controller;
 
+import com.example.to_do.dto.LoginResponse;
 import com.example.to_do.model.User;
 import com.example.to_do.service.UserService;
 import jakarta.validation.Valid;
@@ -25,7 +26,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.toString());
         }
 
-
         if (userService.emailExists(user.getEmail())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already in use.");
         }
@@ -35,11 +35,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestParam String email, @RequestParam String password) {
+    public ResponseEntity<?> loginUser(@RequestParam String email, @RequestParam String password) {
         User user = userService.loginUser(email, password);
         if (user != null) {
-            // Optionally return user information or a token here
-            return ResponseEntity.ok("Login successful.");
+            LoginResponse response = new LoginResponse(user.getId(), user.getEmail());
+            return ResponseEntity.ok(response);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password.");
     }
