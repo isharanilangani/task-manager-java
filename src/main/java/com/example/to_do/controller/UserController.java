@@ -1,6 +1,7 @@
 package com.example.to_do.controller;
 
 import com.example.to_do.dto.LoginResponse;
+import com.example.to_do.dto.UpdateUserRequest;
 import com.example.to_do.model.User;
 import com.example.to_do.service.UserService;
 import jakarta.validation.Valid;
@@ -52,4 +53,30 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<String> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserRequest updateUserRequest,
+            BindingResult result) {
+
+        if (result.hasErrors()) {
+            // Log validation errors
+            StringBuilder errors = new StringBuilder("Validation failed: ");
+            result.getAllErrors().forEach(error -> errors.append(error.getDefaultMessage()).append("; "));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.toString());
+        }
+
+        User existingUser = userService.getUserById(id);
+        if (existingUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+
+        existingUser.setName(updateUserRequest.getName());
+        existingUser.setPassword(updateUserRequest.getPassword()); // Assuming password is stored in plain text, which should be avoided
+
+        userService.updateUser(existingUser);
+        return ResponseEntity.ok("User updated successfully.");
+    }
+
 }

@@ -35,4 +35,21 @@ public class UserService {
     public User getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
+
+    public void updateUser(User user) {
+        User existingUser = userRepository.findById(user.getId()).orElse(null);
+        if (existingUser != null) {
+            // Update fields if provided
+            if (user.getName() != null && !user.getName().isEmpty()) {
+                existingUser.setName(user.getName());
+            }
+
+            // Encode the new password before saving (if it's being updated)
+            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+                existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+
+            userRepository.save(existingUser);
+        }
+    }
 }
