@@ -43,4 +43,13 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password.");
     }
+
+    @GetMapping("/name/{id}")
+    public ResponseEntity<?> getUserNameById(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        if (user != null) {
+            return ResponseEntity.ok(user.getName());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+    }
 }
